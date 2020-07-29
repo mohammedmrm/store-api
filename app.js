@@ -11,6 +11,7 @@ require('dotenv').config();
 const store_query = require('./routes/store_query');
 const myBasket = require('./routes/myBasket');
 const category = require('./routes/category');
+const configurableProduct = require('./routes/configurableProduct');
 
 
 // app
@@ -31,6 +32,7 @@ app.disable('etag');
 app.use('/api', store_query);
 app.use('/api', myBasket);
 app.use('/api', category);
+app.use('/api', configurableProduct);
 const port = process.env.PORT || 8050;
 
 app.listen(port, () => {

@@ -49,8 +49,8 @@ exports.basket = (req, response) => {
         const password = req.query.password;
         const basket_id = req.query.basket_id;
         var id = 0;
-        query = `select * from staff where phone=${username}`;
-        con.query(query, function (err, data) {
+        query = `select * from staff where phone=?`;
+        con.query(query,[username], function (err, data) {
             //console.log('data',data);
             hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
             bcrypt.compare(password, hash, function (err, res) {
@@ -97,8 +97,8 @@ exports.deletebasket = (req, response) => {
         const password = req.query.password;
         const basket_id = req.query.basket_id;
         var id = 0;
-        query = `select * from staff where phone=${username}`;
-        con.query(query, function (err, data) {
+        query = `select * from staff where phone=?`;
+        con.query(query,[username], function (err, data) {
             //console.log('data',data);
             hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
             bcrypt.compare(password, hash, function (err, res) {
@@ -233,67 +233,8 @@ exports.addToBasket = (req, response) => {
                 id = data[0].id;
                 try {
                     query = `insert into basket_items (configurable_product_id,basket_id,qty,staff_id) 
-                    values (${c_id},${basket_id},${qty},${id})`;
-                    con.query(query, function (err, data) {
-                        numRows = data.affectedRows;
-                        if (numRows > 0) {
-                            response.json({
-                                code: 200,
-                                success: '1',
-                                data: data,
-                            });
-                        } else {
-                            response.json({
-                                code: 200,
-                                success: '0',
-                                data: data,
-                            });
-                        }
-                    });
-                } catch (err) {
-                    response.json({
-                        code: 200,
-                        success: "0",
-                        data: [{ error: err }],
-                    });
-                }
-            } else {
-                response.json({
-                    code: 300,
-                    success: "0",
-                    message: "incorect username or password"
-                });
-            }
-        });
-    } catch (err) {
-        response.json({
-            code: 200,
-            success: "0",
-            data: [{ error: err }],
-        });
-    }
-};
-exports.addToBasket = (req, response) => {
-    try {
-        const username = req.query.username;
-        const password = req.query.password;
-        const basket_id = req.query.basket_id;
-        const c_id = req.query.c_id;
-        const qty = req.query.qty;
-        var id = 0;
-        query = `select * from staff where phone=${username}`;
-        con.query(query, function (err, data) {
-            //console.log('data',data);
-            hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
-            bcrypt.compare(password, hash, function (err, res) {
-                access = res;
-            });
-            if (access) {
-                id = data[0].id;
-                try {
-                    query = `insert into basket_items (configurable_product_id,basket_id,qty,staff_id) 
-                    values (${c_id},${basket_id},${qty},${id})`;
-                    con.query(query, function (err, data) {
+                    values (?,?,?,?)`;
+                    con.query(query,[c_id,basket_id,qty,id], function (err, data) {
                         numRows = data.affectedRows;
                         if (numRows > 0) {
                             response.json({
