@@ -6,11 +6,10 @@ let data;
 var products = [];
 
 exports.list = (req, response) => {
-  const limit = !req.limit && req.limit < 10 ? 10 : req.limit;
-  const pageIndex = !req.limit && req.pageIndex < 1 ? 1 : req.pageIndex;
-  const search = !req.search ? "" : req.search;
-  const category=!req.category ? "" : req.category;
-
+  let limit = req.query.limit ? parseInt(req.query.limit) : 20;
+  let page = ((req.query.page && parseInt(req.query.page) > 0) ? parseInt(req.query.page) : 1);
+  const search = !req.query.search ? "" : req.query.search;
+  const category = !req.query.category ? "" : req.query.category;
   try {
     query = `select product.*,category.title as category_name,
             stores.name as store_name,image.img as img
@@ -22,7 +21,7 @@ exports.list = (req, response) => {
             if(category>=1){
               query+=` and category.id=${category}`;
             }
-            let page = (1-1)*10;
+            page = (page-1)*limit;
             query+=` limit ${page} , ${10}`;
             console.log(query);
     con.query(query, function (error, data) {
