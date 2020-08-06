@@ -24,6 +24,7 @@ exports.list = (req, response) => {
             page = (page-1)*limit;
             query+=` limit ${page} , ${10}`;
             console.log(query);
+    products = [];
     con.query(query, function (error, data) {
       let id;
       data.forEach((product) => {
