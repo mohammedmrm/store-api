@@ -21,7 +21,7 @@ exports.list = (req, response) => {
               query+=` and category.id=${category}`;
             }
             page = (page-1)*limit;
-            query+=` limit ${page} , ${10}`;
+            query+=` limit ${page} , ${limit}`;
             console.log(query);
     con.query(query, function (error, data) {
       let id;
