@@ -17,12 +17,12 @@ exports.list = (req, response) => {
             left join category on category.id = product.category_id
             left join (select max(path) as img,product_id from images 
             group by product_id) image on image.product_id = product.id`;
-            if(category>=1){
-              query+=` and category.id=${category}`;
-            }
-            page = (page-1)*limit;
-            query+=` limit ${page} , ${limit}`;
-            console.log(query);
+    if (category >= 1) {
+      query += ` and category.id=${category}`;
+    }
+    page = (page - 1) * limit;
+    query += ` limit ${page} , ${limit}`;
+    console.log(query);
     con.query(query, function (error, data) {
       let id;
       data.forEach((product) => {
@@ -58,7 +58,62 @@ exports.list = (req, response) => {
         success: "1",
         data: products,
       });
-      products = [];
+    });
+  } catch (err) {
+    response.json({
+      code: 200,
+      success: "0",
+      data: [{ error: err }],
+    });
+  }
+};
+exports.configrableProduct = (req, response) => {
+  let product = req.query.product;
+  let config = req.query.options;
+  let options = "";
+  let count=0;
+  try {
+    sql = `select attribute_id from sub_option 
+          left join configurable_product on configurable_product.id = sub_option.configurable_product_id
+          left join product on product.id = configurable_product.product_id
+          where product.id = ${product} GROUP by sub_option.attribute_id`;
+          console.log(sql);
+    con.query(sql, function (error, adj) {
+      count = adj.length;
+      console.log(count, config.length);
+      if (count == config.length) {
+        i = 0;
+        config.forEach((conf) => {
+          if (i == 0) {
+            options += ' attribute_config_id=' + conf;
+          } else {
+            options += ' or attribute_config_id=' + conf;
+          }
+          i++;
+        });
+        query = `SELECT configurable_product_id,COUNT(configurable_product_id) as count 
+                FROM sub_option 
+                left join configurable_product on configurable_product.id = sub_option.configurable_product_id 
+                left join product on configurable_product.product_id = product.id 
+                where ( ${options} ) and product.id = ${product} 
+                GROUP by configurable_product_id 
+                order by COUNT(configurable_product_id) DESC 
+                limit 1`;
+        console.log(query);
+        con.query(query, function (error, data) {
+          response.json({
+            code: 200,
+            success: "1",
+            data: data,
+          });
+        });
+      }else{
+        response.json({
+          code: 200,
+          success: "0",
+          error: 'select all options',
+        });
+       }
     });
   } catch (err) {
     response.json({
