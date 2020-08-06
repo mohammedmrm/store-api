@@ -49,10 +49,11 @@ exports.list = (req, response) => {
               // response.send(attributes);
             });
             product.attribute = attributes;
-            products.push(product);
+            
             //  console.log(products);
           });
         });
+        products.push(product);
       });
       response.json({
         code: 200,
