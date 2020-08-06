@@ -4,7 +4,6 @@ var con = configuration.connection;
 let success;
 let data;
 var products = [];
-
 exports.list = (req, response) => {
   let limit = req.query.limit ? parseInt(req.query.limit) : 20;
   let page = ((req.query.page && parseInt(req.query.page) > 0) ? parseInt(req.query.page) : 1);
@@ -24,7 +23,6 @@ exports.list = (req, response) => {
             page = (page-1)*limit;
             query+=` limit ${page} , ${10}`;
             console.log(query);
-    products = [];
     con.query(query, function (error, data) {
       let id;
       data.forEach((product) => {
@@ -50,17 +48,17 @@ exports.list = (req, response) => {
               // response.send(attributes);
             });
             product.attribute = attributes;
-            
+            products.push(product);
             //  console.log(products);
           });
         });
-        products.push(product);
       });
       response.json({
         code: 200,
         success: "1",
         data: products,
       });
+      products = [];
     });
   } catch (err) {
     response.json({
