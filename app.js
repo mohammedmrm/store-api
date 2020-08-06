@@ -12,6 +12,9 @@ const store_query = require('./routes/store_query');
 const myBasket = require('./routes/myBasket');
 const category = require('./routes/category');
 const configurableProduct = require('./routes/configurableProduct');
+const favourite = require('./routes/favourite');
+const city = require('./routes/city');
+const town = require('./routes/town');
 
 
 // app
@@ -33,6 +36,9 @@ app.use('/api', store_query);
 app.use('/api', myBasket);
 app.use('/api', category);
 app.use('/api', configurableProduct);
+app.use('/api', favourite);
+app.use('/api', city);
+app.use('/api', town);
 const port = process.env.PORT || 8050;
 
 app.listen(port, () => {
