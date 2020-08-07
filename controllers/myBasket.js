@@ -18,7 +18,10 @@ exports.list = (req, response) => {
         if (access) {
             id = data[0].id;
             try {
-                query = `select * from basket where staff_id=${id}`;
+                query = `select basket.*,cites.name as city,towns.name as town from basket 
+                    LEFT join cites on cites.id = basket.city_id
+                    LEFT join towns on towns.id = basket.town_id
+                    where staff_id=${id}`;
                 console.log(query);
                 con.query(query, function (err, data) {
                     response.json({
@@ -50,7 +53,7 @@ exports.basket = (req, response) => {
         const basket_id = req.query.basket_id;
         var id = 0;
         query = `select * from staff where phone=?`;
-        con.query(query,[username], function (err, data) {
+        con.query(query, [username], function (err, data) {
             //console.log('data',data);
             hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
             bcrypt.compare(password, hash, function (err, res) {
@@ -98,7 +101,7 @@ exports.deletebasket = (req, response) => {
         const basket_id = req.query.basket_id;
         var id = 0;
         query = `select * from staff where phone=?`;
-        con.query(query,[username], function (err, data) {
+        con.query(query, [username], function (err, data) {
             //console.log('data',data);
             hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
             bcrypt.compare(password, hash, function (err, res) {
@@ -219,34 +222,75 @@ exports.addToBasket = (req, response) => {
         const username = req.query.username;
         const password = req.query.password;
         const basket_id = req.query.basket_id;
-        const c_id = req.query.c_id;
         const qty = req.query.qty;
-        var id = 0;
+        const product = req.query.product;
+        const config = req.query.options;
+        let options = "";
+        let count = 0;
+        let id = 0;
         query = `select * from staff where phone=${username}`;
-        con.query(query, function (err, data) {
+        con.query(query, function (err, user) {
             //console.log('data',data);
-            hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
+            hash = user[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
             bcrypt.compare(password, hash, function (err, res) {
                 access = res;
             });
+            console.log(access);
             if (access) {
-                id = data[0].id;
+                id = user[0].id;
                 try {
-                    query = `insert into basket_items (configurable_product_id,basket_id,qty,staff_id) 
-                    values (?,?,?,?)`;
-                    con.query(query,[c_id,basket_id,qty,id], function (err, data) {
-                        numRows = data.affectedRows;
-                        if (numRows > 0) {
-                            response.json({
-                                code: 200,
-                                success: '1',
-                                data: data,
+                    sql = `select attribute_id from sub_option 
+                            left join configurable_product on configurable_product.id = sub_option.configurable_product_id
+                            left join product on product.id = configurable_product.product_id
+                            where product.id = ${product} GROUP by sub_option.attribute_id`;
+                    console.log(sql);
+                    con.query(sql, function (error, adj) {
+                        count = adj.length;
+                        console.log(count, config.length);
+                        if (count == config.length) {
+                            i = 0;
+                            config.forEach((conf) => {
+                                if (i == 0) {
+                                    options += ' attribute_config_id=' + conf;
+                                } else {
+                                    options += ' or attribute_config_id=' + conf;
+                                }
+                                i++;
+                            });
+                            query = `SELECT configurable_product_id,COUNT(configurable_product_id) as count 
+                                        FROM sub_option 
+                                        left join configurable_product on configurable_product.id = sub_option.configurable_product_id 
+                                        left join product on configurable_product.product_id = product.id 
+                                        where ( ${options} ) and product.id = ${product} 
+                                        GROUP by configurable_product_id 
+                                        order by COUNT(configurable_product_id) DESC 
+                                        limit 1`;
+                            con.query(query, function (error, configrable_product_id) {
+                                query = `insert into basket_items (configurable_product_id,basket_id,qty,staff_id) 
+                                            values (?,?,?,?)`;
+                                console.log(configrable_product_id[0]['configurable_product_id']);
+                                con.query(query, [configrable_product_id[0]['configurable_product_id'], basket_id, qty, id], function (err, data) {
+                                    numRows = data.affectedRows;
+                                    if (numRows > 0) {
+                                        response.json({
+                                            code: 200,
+                                            success: '1',
+                                            data: data,
+                                        });
+                                    } else {
+                                        response.json({
+                                            code: 200,
+                                            success: '0',
+                                            data: data,
+                                        });
+                                    }
+                                });
                             });
                         } else {
                             response.json({
                                 code: 200,
-                                success: '0',
-                                data: data,
+                                success: "0",
+                                error: 'select all options',
                             });
                         }
                     });
@@ -292,7 +336,7 @@ exports.emptyBasket = (req, response) => {
                 id = data[0].id;
                 try {
                     query = `delete from basket_items 
-                    where basket_id = ${basket_id} and staff_id = ${id }`;
+                    where basket_id = ${basket_id} and staff_id = ${id}`;
                     con.query(query, function (err, data) {
                         numRows = data.affectedRows;
                         if (numRows > 0) {
