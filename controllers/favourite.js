@@ -55,6 +55,8 @@ exports.creatList = (req, response) => {
     const username = req.query.username;
     const password = req.query.password;
     const listname = req.query.listname;
+    const bg_color = req.query.bg_color;
+    const font_color = req.query.font_color;
     var id = 0;
     query = `select * from staff where phone=?`;
     con.query(query, [username], function (err, data) {
@@ -67,9 +69,9 @@ exports.creatList = (req, response) => {
             if (access) {
                 id = data[0].id;
                 try {
-                    query = `insert into list (mandop_id,name) values(?,?)`;
+                    query = `insert into list (mandop_id,name,font_color,bg_color) values(?,?,?,?)`;
                     console.log(query);
-                    con.query(query, [id, listname], function (err, data) {
+                    con.query(query, [id, listname, font_color, bg_color], function (err, data) {
                         response.json({
                             code: 200,
                             success: "1",
