@@ -94,7 +94,7 @@ exports.basket = (req, response) => {
         });
     }
 };
-exports.deletebasket = (req, response) => {
+exports.deletebasket = (req,response) => {
     try {
         const username = req.query.username;
         const password = req.query.password;
@@ -151,7 +151,7 @@ exports.deletebasket = (req, response) => {
         });
     }
 };
-exports.updateBasket = (req, response) => {
+exports.updateBasket = (req,response) => {
     try {
         const username = req.query.username;
         const password = req.query.password;
@@ -217,7 +217,7 @@ exports.updateBasket = (req, response) => {
         });
     }
 };
-exports.addToBasket = (req, response) => {
+exports.addToBasket = (req,response) => {
     try {
         const username = req.query.username;
         const password = req.query.password;
@@ -330,7 +330,7 @@ exports.addToBasket = (req, response) => {
         });
     }
 };
-exports.emptyBasket = (req, response) => {
+exports.emptyBasket = (req,response) => {
     try {
         const username = req.query.username;
         const password = req.query.password;
