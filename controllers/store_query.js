@@ -3,22 +3,31 @@ var configuration = require("../databaseConfig");
 var con = configuration.connection;
 let success;
 let data;
-var products = [];
+let products = [];
 exports.list = (req, response) => {
   let limit = req.query.limit ? parseInt(req.query.limit) : 20;
   let page = ((req.query.page && parseInt(req.query.page) > 0) ? parseInt(req.query.page) : 1);
   const search = !req.query.search ? "" : req.query.search;
   const category = !req.query.category ? "" : req.query.category;
+  const list_id = !req.query.list ? "" : req.query.list;
   try {
     query = `select product.*,category.title as category_name,
             stores.name as store_name,image.img as img
             from product
             left join stores on stores.id = product.store_id
             left join category on category.id = product.category_id
+            left join list_items on list_items.product_id = product.id
             left join (select max(path) as img,product_id from images 
-            group by product_id) image on image.product_id = product.id`;
+            group by product_id) image on image.product_id = product.id
+            where product.id <> 0 `;
     if (category >= 1) {
       query += ` and category.id=${category}`;
+    }
+    if (list_id >= 1) {
+      query += ` and list_items.list_id=${list_id}`;
+    }    
+    if (search != '') {
+      query += ` and (MATCH (product.name) AGAINST ('${search}*' IN BOOLEAN MODE))`;
     }
     page = (page - 1) * limit;
     query += ` limit ${page} , ${limit}`;
@@ -58,6 +67,7 @@ exports.list = (req, response) => {
         success: "1",
         data: products,
       });
+      
     });
   } catch (err) {
     response.json({

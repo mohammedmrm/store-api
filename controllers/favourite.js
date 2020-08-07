@@ -51,12 +51,12 @@ exports.list = (req, response) => {
         }
     });
 };
-exports.creatList = (req, response) => {
+exports.createList = (req, response) => {
     const username = req.query.username;
     const password = req.query.password;
     const listname = req.query.listname;
-    const bg_color = req.query.bg_color;
-    const font_color = req.query.font_color;
+    const bg_color = req.query.bg_color ? req.query.bg_color : '#ffffff';
+    const font_color = req.query.font_color ? req.query.font_color : '#000000';
     var id = 0;
     query = `select * from staff where phone=?`;
     con.query(query, [username], function (err, data) {
@@ -70,7 +70,7 @@ exports.creatList = (req, response) => {
                 id = data[0].id;
                 try {
                     query = `insert into list (mandop_id,name,font_color,bg_color) values(?,?,?,?)`;
-                    console.log(query);
+                    console.log(query, id, listname, bg_color, font_color, req.query);
                     con.query(query, [id, listname, font_color, bg_color], function (err, data) {
                         response.json({
                             code: 200,
