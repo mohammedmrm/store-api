@@ -222,7 +222,7 @@ exports.addToBasket = (req, response) => {
         const username = req.query.username;
         const password = req.query.password;
         const basket_id = req.query.basket_id;
-        const qty = req.query.qty;
+        const qty = req.query.qty ? req.query.qty : 1;
         const product = req.query.product;
         const config = req.query.options;
         let options = "";
@@ -250,13 +250,19 @@ exports.addToBasket = (req, response) => {
                         if (count == config.length) {
                             i = 0;
                             config.forEach((conf) => {
-                                if (i == 0) {
-                                    options += ' attribute_config_id=' + conf;
+                                if (conf) {
+                                    if (i == 0) {
+                                        options += ' attribute_config_id=' + conf;
+                                    } else {
+                                        options += ' or attribute_config_id=' + conf;
+                                    }
+                                    i++;
                                 } else {
-                                    options += ' or attribute_config_id=' + conf;
+                                    break;
                                 }
-                                i++;
+                                
                             });
+                            if (i == count){
                             query = `SELECT configurable_product_id,COUNT(configurable_product_id) as count 
                                         FROM sub_option 
                                         left join configurable_product on configurable_product.id = sub_option.configurable_product_id 
@@ -286,6 +292,13 @@ exports.addToBasket = (req, response) => {
                                     }
                                 });
                             });
+                            }else{
+                                response.json({
+                                    code: 200,
+                                    success: "0",
+                                    error: 'select all options',
+                                });
+                            }
                         } else {
                             response.json({
                                 code: 200,
