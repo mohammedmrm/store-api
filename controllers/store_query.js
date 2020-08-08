@@ -16,7 +16,7 @@ exports.list = (req, response) => {
   let access = false;
   let id = 0;
   try {
-    query = `select product.*,list.bg_color,list.font_color,list.name as listname,category.title as category_name,
+    query = `select product.*,category.title as category_name,
             stores.name as store_name,image.img as img
             from product
             left join stores on stores.id = product.store_id
