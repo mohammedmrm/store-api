@@ -95,7 +95,7 @@ exports.basket = (req, response) => {
         });
     }
 };
-exports.deletebasket = (req,response) => {
+exports.deleteBasket = (req,response) => {
     try {
         const username = req.query.username;
         const password = req.query.password;
@@ -222,7 +222,7 @@ exports.createBasket = (req, response) => {
     try {
         const username = req.query.username;
         const password = req.query.password;
-        const name = req.query.basket_id;
+        const name = req.query.name;
         const city_id = req.query.city_id;
         const town_id = req.query.town_id;
         const address = req.query.address;
@@ -414,6 +414,62 @@ exports.emptyBasket = (req,response) => {
                     query = `delete from basket_items 
                     where basket_id = ${basket_id} and staff_id = ${id}`;
                     con.query(query, function (err, data) {
+                        numRows = data.affectedRows;
+                        if (numRows > 0) {
+                            response.json({
+                                code: 200,
+                                success: '1',
+                                data: data,
+                            });
+                        } else {
+                            response.json({
+                                code: 200,
+                                success: '0',
+                                data: data,
+                            });
+                        }
+                    });
+                } catch (err) {
+                    response.json({
+                        code: 200,
+                        success: "0",
+                        data: [{ error: err }],
+                    });
+                }
+            } else {
+                response.json({
+                    code: 300,
+                    success: "0",
+                    message: "incorect username or password"
+                });
+            }
+        });
+    } catch (err) {
+        response.json({
+            code: 200,
+            success: "0",
+            data: [{ error: err }],
+        });
+    }
+};
+exports.cancelBasket = (req, response) => {
+    try {
+        const username = req.query.username;
+        const password = req.query.password;
+        const basket_id = req.query.basket_id;
+        var id = 0;
+        query = `select * from staff where phone=${username}`;
+        con.query(query, function (err, data) {
+            //console.log('data',data);
+            hash = data[0].password.replace(/^\$2y(.+)$/i, '$2a$1');
+            bcrypt.compare(password, hash, function (err, res) {
+                access = res;
+            });
+            if (access) {
+                id = data[0].id;
+                try {
+                    query = `update basket set status = 1 where id=? and staff_id=?`;
+                    con.query(query, [ basket_id, id], function (err, data) {
                         numRows = data.affectedRows;
                         if (numRows > 0) {
                             response.json({

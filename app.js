@@ -15,6 +15,7 @@ const configurableProduct = require('./routes/configurableProduct');
 const favourite = require('./routes/favourite');
 const city = require('./routes/city');
 const town = require('./routes/town');
+const orders = require('./routes/orders');
 
 
 // app
@@ -39,6 +40,7 @@ app.use('/api', configurableProduct);
 app.use('/api', favourite);
 app.use('/api', city);
 app.use('/api', town);
+app.use('/api', orders);
 const port = process.env.PORT || 8050;
 
 app.listen(port, () => {

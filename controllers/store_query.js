@@ -21,8 +21,6 @@ exports.list = (req, response) => {
             from product
             left join stores on stores.id = product.store_id
             left join category on category.id = product.category_id
-            left join list_items on list_items.product_id = product.id 
-            left join list on list.id = list_items.list_id and list.mandop_id = ${id}
             left join (select max(path) as img,product_id from images 
             group by product_id) image on image.product_id = product.id
             where product.id <> 0`;
