@@ -240,8 +240,8 @@ exports.createBasket = (req, response) => {
                 id = data[0].id;
                 try {
                     query = `insert into basket 
-                    (customer_name,customer_phone,city_id,town_id,address,note) values(?,?,?,?,?,?)`;
-                    con.query(query,[name,phone,city_id,town_id,address,note], function (err, data) {
+                    (customer_name,customer_phone,city_id,town_id,address,note,staff_id) values(?,?,?,?,?,?,?)`;
+                    con.query(query,[name,phone,city_id,town_id,address,note,id], function (err, data) {
                         numRows = data.affectedRows;
                         if (numRows > 0) {
                             response.json({
