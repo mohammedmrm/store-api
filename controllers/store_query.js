@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const { errorHandler } = require("../helpers/dbErrorHandler");
 var configuration = require("../databaseConfig");
 var con = configuration.connection;
@@ -10,16 +11,21 @@ exports.list = (req, response) => {
   const search = !req.query.search ? "" : req.query.search;
   const category = !req.query.category ? "" : req.query.category;
   const list_id = !req.query.list ? "" : req.query.list;
+  const username = req.query.username;
+  const password = req.query.password;
+  let access = false;
+  let id = 0;
   try {
-    query = `select product.*,category.title as category_name,
+    query = `select product.*,list.bg_color,list.font_color,list.name as listname,category.title as category_name,
             stores.name as store_name,image.img as img
             from product
             left join stores on stores.id = product.store_id
             left join category on category.id = product.category_id
-            left join list_items on list_items.product_id = product.id
+            left join list_items on list_items.product_id = product.id 
+            left join list on list.id = list_items.list_id and list.mandop_id = ${id}
             left join (select max(path) as img,product_id from images 
             group by product_id) image on image.product_id = product.id
-            where product.id <> 0 `;
+            where product.id <> 0`;
     if (category >= 1) {
       query += ` and category.id=${category}`;
     }
@@ -134,6 +140,3 @@ exports.configrableProduct = (req, response) => {
   }
 };
 
-// response.json({
-//     data,
-//   });
