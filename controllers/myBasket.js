@@ -160,8 +160,8 @@ exports.updateBasket = (req,response) => {
         const name = req.query.name;
         const city_id = req.query.city_id;
         const town_id = req.query.town_id;
-        const address = req.query.address;
-        const note = req.query.note;
+        const address = req.query.address || "";
+        const note = req.query.note || "";
         const phone = req.query.phone;
         var id = 0;
         query = `select * from staff where phone=${username}`;
@@ -179,6 +179,7 @@ exports.updateBasket = (req,response) => {
                             address=${address},city_id=${city_id},
                             town_id=${town_id},note=${note}     
                             where id=${basket_id} and staff_id=${id}`;
+                            console.log(query);
                     con.query(query, function (err, data) {
                         numRows = data.affectedRows;
                         if (numRows > 0) {
