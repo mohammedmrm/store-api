@@ -175,9 +175,9 @@ exports.updateBasket = (req,response) => {
                 id = data[0].id;
                 try {
                     query = `update  basket set
-                            customer_name = ${name},customer_phone=${phone},
-                            address=${address},city_id=${city_id},
-                            town_id=${town_id},note=${note}     
+                            customer_name = '${name}',customer_phone='${phone}',
+                            address='${address}',city_id=${city_id},
+                            town_id=${town_id},note='${note}'     
                             where id=${basket_id} and staff_id=${id}`;
                             console.log(query);
                     con.query(query, function (err, data) {
