@@ -157,12 +157,12 @@ exports.updateBasket = (req,response) => {
         const username = req.query.username;
         const password = req.query.password;
         const basket_id = req.query.basket_id;
-        const name = req.query.basket_id;
+        const name = req.query.name;
         const city_id = req.query.city_id;
         const town_id = req.query.town_id;
         const address = req.query.address;
         const note = req.query.note;
-        const phone = req.query.basket_id;
+        const phone = req.query.phone;
         var id = 0;
         query = `select * from staff where phone=${username}`;
         con.query(query, function (err, data) {
@@ -174,7 +174,7 @@ exports.updateBasket = (req,response) => {
             if (access) {
                 id = data[0].id;
                 try {
-                    query = `update * from basket set
+                    query = `update  basket set
                             customer_name = ${name},customer_phone=${phone},
                             address=${address},city_id=${city_id},
                             town_id=${town_id},note=${note}     
