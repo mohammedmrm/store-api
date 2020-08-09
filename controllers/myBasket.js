@@ -286,7 +286,7 @@ exports.addToBasket = (req,response) => {
         const username = req.query.username;
         const password = req.query.password;
         const basket_id = req.query.basket_id;
-        const qty = req.query.qty ? req.query.qty : 1;
+        const qty = req.query.qty || 1;
         const product = req.query.product;
         const config = req.query.options;
         let options = "";
@@ -314,17 +314,12 @@ exports.addToBasket = (req,response) => {
                         if (count == config.length) {
                             i = 0;
                             config.forEach((conf) => {
-                                if (conf) {
-                                    if (i == 0) {
+                                if (i == 0) {
                                         options += ' attribute_config_id=' + conf;
                                     } else {
                                         options += ' or attribute_config_id=' + conf;
                                     }
-                                    i++;
-                                } else {
-                                    break;
-                                }
-                                
+                                i++;
                             });
                             if (i == count){
                             query = `SELECT configurable_product_id,COUNT(configurable_product_id) as count 
@@ -337,9 +332,10 @@ exports.addToBasket = (req,response) => {
                                         limit 1`;
                             con.query(query, function (error, configrable_product_id) {
                                 query = `insert into basket_items (configurable_product_id,basket_id,qty,staff_id) 
-                                            values (?,?,?,?)`;
-                                console.log(configrable_product_id[0]['configurable_product_id']);
-                                con.query(query, [configrable_product_id[0]['configurable_product_id'], basket_id, qty, id], function (err, data) {
+                                            values (${configrable_product_id[0]['configurable_product_id']},${basket_id},${qty},${id})`;
+                                
+                                console.log(query);
+                                con.query(query, function (err, data) {
                                     numRows = data.affectedRows;
                                     if (numRows > 0) {
                                         response.json({
