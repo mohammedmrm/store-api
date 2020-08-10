@@ -6,6 +6,7 @@ let success;
 let data;
 let products = [];
 exports.list = (req, response) => {
+  console.log("request arrived for URL", req.url);
   let limit = req.query.limit ? parseInt(req.query.limit) : 20;
   let page = ((req.query.page && parseInt(req.query.page) > 0) ? parseInt(req.query.page) : 1);
   const search = !req.query.search ? "" : req.query.search;
@@ -35,7 +36,7 @@ exports.list = (req, response) => {
     }
     page = (page - 1) * limit;
     query += ` limit ${page} , ${limit}`;
-    console.log(query);
+    //console.log(query);
     con.query(query, function (error, data) {
       let id;
       data.forEach((product) => {
@@ -71,8 +72,9 @@ exports.list = (req, response) => {
         success: "1",
         data: products,
       });
-      
+      products = [];
     });
+    
   } catch (err) {
     response.json({
       code: 200,
@@ -80,6 +82,7 @@ exports.list = (req, response) => {
       data: [{ error: err }],
     });
   }
+  
 };
 exports.configrableProduct = (req, response) => {
   let product = req.query.product;
