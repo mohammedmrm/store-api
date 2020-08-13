@@ -23,7 +23,7 @@ exports.list = (req, response) => {
                 sql = `select basket.*,cites.name as city,towns.name as town from basket 
                     LEFT join cites on cites.id = basket.city_id
                     LEFT join towns on towns.id = basket.town_id
-                    where staff_id=${basket_id}`;
+                    where staff_id=${id}`;
                 console.log(sql);
                 con.query(sql, function (err, data) {
                     response.json({
